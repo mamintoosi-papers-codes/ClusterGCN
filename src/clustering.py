@@ -123,7 +123,7 @@ class ClusteringMachine(object):
         self.sg_test_nodes = {}
         self.sg_features = {}
         self.sg_targets = {}
-        print(self.clusters)
+        print('Num Clusters:', len(self.clusters))
         for cluster in self.clusters:
             # M.Amintoosi
             if self.args.clustering_method == "danmf":
