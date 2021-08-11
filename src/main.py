@@ -12,6 +12,7 @@ def main():
     torch.manual_seed(args.seed)
     tab_printer(args)
     graph = graph_reader(args.edge_path)
+    print('Number of graph nodes: ',len(graph.nodes()))
     features = feature_reader(args.features_path)
     target = target_reader(args.target_path)
     clustering_machine = ClusteringMachine(args, graph, features, target)

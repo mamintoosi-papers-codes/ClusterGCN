@@ -73,10 +73,12 @@ class ClusteringMachine(object):
         # coms = algorithms.mnmf(self.graph, clusters=self.args.cluster_number)
         # coms = algorithms.umstmo(G)
         # coms = algorithms.principled_clustering(self.graph, cluster_count=self.args.cluster_number)
-        coms = algorithms.em(self.graph, k=self.args.cluster_number)
+        # coms = algorithms.em(self.graph, k=self.args.cluster_number)
+        coms = algorithms.conga(self.graph, number_communities=self.args.cluster_number)
         
         count = sum( [ len(listElem) for listElem in coms.communities])
-        parts = [0] * count
+        print('Number of nodes in clustering:', count)
+        parts = [0] * len(self.graph.nodes()) #count
         for i in range(len(coms.communities)):
             for x in coms.communities[i]:
                 parts[x] = i
