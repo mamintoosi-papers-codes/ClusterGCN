@@ -65,8 +65,16 @@ class ClusteringMachine(object):
         """
         Clustering the graph with other graph clustering algorithms
         """
-        print(type(self.graph))
-        coms = algorithms.louvain(self.graph)
+        # print('principled_clustering clustering')
+        # coms = algorithms.kclique(G, k=4)
+        # coms = algorithms.louvain(G)
+        # coms = algorithms.girvan_newman(G, level=4)
+        # coms = algorithms.aslpaw(G)
+        # coms = algorithms.mnmf(self.graph, clusters=self.args.cluster_number)
+        # coms = algorithms.umstmo(G)
+        # coms = algorithms.principled_clustering(self.graph, cluster_count=self.args.cluster_number)
+        coms = algorithms.em(self.graph, k=self.args.cluster_number)
+        
         count = sum( [ len(listElem) for listElem in coms.communities])
         parts = [0] * count
         for i in range(len(coms.communities)):
