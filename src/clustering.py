@@ -4,7 +4,10 @@ import random
 import numpy as np
 import networkx as nx
 from sklearn.model_selection import train_test_split
-from cdlib import algorithms, viz
+from sklearn.preprocessing import normalize
+# from cdlib import algorithms, viz
+# با کتابخانه بالا در کولب مشکل دارم!
+from karateclub.community_detection.overlapping import DANMF
 
 class ClusteringMachine(object):
     """
@@ -40,6 +43,9 @@ class ClusteringMachine(object):
         elif self.args.clustering_method == "random":
             print("\nRandom graph clustering started.\n")
             self.random_clustering()
+        elif self.args.clustering_method == "danmf":
+            print("\nDANMF clustering started.\n")
+            self.danmf_clustering()
         elif self.args.clustering_method == "graph":
             print("\ngraph clustering started.\n")
             self.graph_clustering()
@@ -61,6 +67,27 @@ class ClusteringMachine(object):
         self.clusters = list(set(parts))
         self.cluster_membership = {node: membership for node, membership in enumerate(parts)}
 
+    def danmf_clustering(self):
+        """
+        Clustering the graph with DANMF. For details see:
+        """
+        model = DANMF()
+        model.fit(self.graph)
+        # نرم دوی هر سطر ماتریس برابر یک می شود
+        P = normalize(model._P, axis=1)
+        near_clusters = []
+        for i in range(P.shape[0]):
+            row = P[i]
+            max_in_row = np.max(row)
+            near_clusters.append(np.where(row>max_in_row/4)[0].tolist())
+
+        # (st, parts) = metis.part_graph(self.graph, self.args.cluster_number)
+        values = model.get_memberships().values()
+        values_list = list(values)
+
+        self.clusters = list(set(values_list))
+        self.cluster_membership = {node: membership for node, membership in enumerate(near_clusters)}
+
     def graph_clustering(self):
         """
         Clustering the graph with other graph clustering algorithms
@@ -75,6 +102,7 @@ class ClusteringMachine(object):
         # coms = algorithms.principled_clustering(self.graph, cluster_count=self.args.cluster_number)
         # coms = algorithms.em(self.graph, k=self.args.cluster_number)
         coms = algorithms.conga(self.graph, number_communities=self.args.cluster_number)
+        
         
         count = sum( [ len(listElem) for listElem in coms.communities])
         print('Number of nodes in clustering:', count)
@@ -95,8 +123,13 @@ class ClusteringMachine(object):
         self.sg_test_nodes = {}
         self.sg_features = {}
         self.sg_targets = {}
+        print(self.clusters)
         for cluster in self.clusters:
-            subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if self.cluster_membership[node] == cluster])
+            # M.Amintoosi
+            if self.args.clustering_method == "danmf":
+                subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
+            else:
+                subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if self.cluster_membership[node] == cluster])
             self.sg_nodes[cluster] = [node for node in sorted(subgraph.nodes())]
             mapper = {node: i for i, node in enumerate(sorted(self.sg_nodes[cluster]))}
             self.sg_edges[cluster] = [[mapper[edge[0]], mapper[edge[1]]] for edge in subgraph.edges()] +  [[mapper[edge[1]], mapper[edge[0]]] for edge in subgraph.edges()]
