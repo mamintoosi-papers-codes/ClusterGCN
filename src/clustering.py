@@ -4,6 +4,7 @@ import random
 import numpy as np
 import networkx as nx
 from sklearn.model_selection import train_test_split
+from cdlib import algorithms, viz
 
 class ClusteringMachine(object):
     """
@@ -36,9 +37,12 @@ class ClusteringMachine(object):
         if self.args.clustering_method == "metis":
             print("\nMetis graph clustering started.\n")
             self.metis_clustering()
-        else:
+        elif self.args.clustering_method == "random":
             print("\nRandom graph clustering started.\n")
             self.random_clustering()
+        elif self.args.clustering_method == "graph":
+            print("\ngraph clustering started.\n")
+            self.graph_clustering()
         self.general_data_partitioning()
         self.transfer_edges_and_nodes()
 
@@ -54,6 +58,20 @@ class ClusteringMachine(object):
         Clustering the graph with Metis. For details see:
         """
         (st, parts) = metis.part_graph(self.graph, self.args.cluster_number)
+        self.clusters = list(set(parts))
+        self.cluster_membership = {node: membership for node, membership in enumerate(parts)}
+
+    def graph_clustering(self):
+        """
+        Clustering the graph with other graph clustering algorithms
+        """
+        print(type(self.graph))
+        coms = algorithms.louvain(self.graph)
+        count = sum( [ len(listElem) for listElem in coms.communities])
+        parts = [0] * count
+        for i in range(len(coms.communities)):
+            for x in coms.communities[i]:
+                parts[x] = i
         self.clusters = list(set(parts))
         self.cluster_membership = {node: membership for node, membership in enumerate(parts)}
 
