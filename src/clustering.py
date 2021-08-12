@@ -44,7 +44,7 @@ class ClusteringMachine(object):
             print("\nRandom graph clustering started.\n")
             self.random_clustering()
         elif self.args.clustering_method == "danmf":
-            print("\nDANMF clustering started.\n")
+            # print("\nDANMF clustering started.\n")
             self.danmf_clustering()
         elif self.args.clustering_method == "graph":
             print("\ngraph clustering started.\n")
@@ -127,6 +127,7 @@ class ClusteringMachine(object):
         self.sg_features = {}
         self.sg_targets = {}
         print('Num Clusters:', len(self.clusters))
+        ClusterNodes = []
         for cluster in self.clusters:
             # M.Amintoosi
             # subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
@@ -134,7 +135,7 @@ class ClusteringMachine(object):
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
             else:
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if self.cluster_membership[node] == cluster])
-            print(len(subgraph.nodes()))
+            ClusterNodes.append(len(subgraph.nodes()))
             self.sg_nodes[cluster] = [node for node in sorted(subgraph.nodes())]
             mapper = {node: i for i, node in enumerate(sorted(self.sg_nodes[cluster]))}
             self.sg_edges[cluster] = [[mapper[edge[0]], mapper[edge[1]]] for edge in subgraph.edges()] +  [[mapper[edge[1]], mapper[edge[0]]] for edge in subgraph.edges()]
@@ -143,7 +144,7 @@ class ClusteringMachine(object):
             self.sg_train_nodes[cluster] = sorted(self.sg_train_nodes[cluster])
             self.sg_features[cluster] = self.features[self.sg_nodes[cluster],:]
             self.sg_targets[cluster] = self.target[self.sg_nodes[cluster],:]
-
+        print("Number of clusters' nodes:", np.sum(ClusterNodes))
     def transfer_edges_and_nodes(self):
         """
         Transfering the data to PyTorch format.

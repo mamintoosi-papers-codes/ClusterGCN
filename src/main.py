@@ -4,6 +4,7 @@ from clustering import ClusteringMachine
 from clustergcn import ClusterGCNTrainer
 from utils import tab_printer, dataset_reader
 import numpy as np
+from tqdm.notebook import tqdm
 # graph_reader, feature_reader, target_reader
 
 def main():
@@ -12,7 +13,7 @@ def main():
     """
     args = parameter_parser()
     torch.manual_seed(args.seed)
-    tab_printer(args)
+    # tab_printer(args)
     # graph, features, target = dataset_reader(args)
     # graph = graph_reader(args.edge_path)
     # # print('Number of graph nodes: ',len(graph.nodes()))
@@ -28,9 +29,10 @@ def main():
         gcn_trainer.train()
         score = gcn_trainer.test()
         Scores.append(score)
-        print("\nF-1 score: {:.4f}".format(score))
+        print("\nF-1 score: {:.2f}".format(score))
 
-    print("\n\n Mean F-1 score: {:.2f}".format(np.mean(Scores)))
+    if args.num_trial>1:
+        print("\n\n Mean F-1 score: {:.2f}".format(np.mean(Scores)))
 
 if __name__ == "__main__":
     main()
