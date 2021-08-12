@@ -53,6 +53,20 @@ class ClusteringMachine(object):
         self.general_data_partitioning()
         self.transfer_edges_and_nodes()
         # print((self.cluster_membership))
+        # cluster_lens = np.zeros(len(self.clusters))
+        # for i in range(len(self.clusters)):
+        #     cluster_lens[self.clusters[i]] += 1
+        # print('Clusters info: Min, Max element numbers:', np.min(cluster_lens), np.max(cluster_lens))
+        print('clusters, len',self.clusters, len(self.clusters))
+        self.cluster_lens = np.zeros(len(self.clusters))
+        for i in range(len(self.cluster_membership)):
+            for j in self.cluster_membership[i]:
+                self.cluster_lens[j] +=1 
+
+        print(self.cluster_lens)        
+        print('Clusters info: Min, Max element numbers:',\
+         np.min(self.cluster_lens), np.max(self.cluster_lens))
+
 
     def random_clustering(self):
         """
@@ -80,6 +94,7 @@ class ClusteringMachine(object):
         model.fit(self.graph)
 
         values = model.get_memberships().values()
+        # print('values', values)
         values_list = list(values)
 
         if self.args.clustering_overlap == False:
@@ -88,6 +103,7 @@ class ClusteringMachine(object):
             # نرم دوی هر سطر ماتریس برابر یک می شود
             # DANMF ->P, SymmNMF->W
             P = normalize(model._W, axis=1)
+            print('P.shape', P.shape)
             near_clusters = []
             for i in range(P.shape[0]):
                 row = P[i]
@@ -98,7 +114,9 @@ class ClusteringMachine(object):
                 near_clusters.append(tmp)
 
         # print("\n near_clusters", type(near_clusters), near_clusters)
-        self.clusters = list(set(values_list))
+        # self.clusters = list(set(values_list)) # وقتی یک خوشه خالی باشه گیر داره
+        # مشکل باید از جای دیگری باشه. شماره ۱۱ خالی نبود ولی غیب بود
+        self.clusters = list(np.arange(0,np.max(values_list)+1))
         self.cluster_membership = {node: membership for node, membership in enumerate(near_clusters)}
         
     def graph_clustering(self):

@@ -23,6 +23,7 @@ def main():
     Scores = []
     for i in range(args.num_trial):
         graph, features, target = dataset_reader(args)
+        print(features.shape, target.shape)
         clustering_machine = ClusteringMachine(args, graph, features, target)
         clustering_machine.decompose()
         gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
