@@ -71,11 +71,11 @@ def dataset_reader(args):
 
     elif dataset_name in ['PubMed', 'Cora', 'CiteSeer']:
         if dataset_name == 'PubMed':
-            dataset = Planetoid(root='../tmp/PubMed', name='PubMed', split='full')
+            dataset = Planetoid(root=args.ds_root+'/PubMed', name='PubMed', split='full')
         elif dataset_name == 'Cora':
-            dataset = Planetoid(root='../tmp/Cora', name='Cora')
+            dataset = Planetoid(root=args.ds_root+'/Cora', name='Cora', split='full')
         elif dataset_name == 'CiteSeer':
-            dataset = Planetoid(root='../tmp/CiteSeer', name='CiteSeer', split='full')
+            dataset = Planetoid(root=args.ds_root+'/CiteSeer', name='CiteSeer', split='full')
         data = dataset[0]
         graph = to_networkx(data, to_undirected=True)
         # node_labels = data.y[list(graph.nodes)].numpy()

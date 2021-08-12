@@ -12,6 +12,11 @@ def parameter_parser():
                         default = "default",
 	                help = "Dataset name (Cora, ...)")
 
+    parser.add_argument("--ds-root",
+                        type = str,
+                        default = "../tmp",
+	                help = "Dataset name (Cora, ...)")
+
     parser.add_argument("--clustering-overlap",
                         type = bool,
                         default = False,
