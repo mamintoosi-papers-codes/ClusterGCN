@@ -13,7 +13,7 @@ def main():
     args = parameter_parser()
     torch.manual_seed(args.seed)
     tab_printer(args)
-    graph, features, target = dataset_reader(args)
+    # graph, features, target = dataset_reader(args)
     # graph = graph_reader(args.edge_path)
     # # print('Number of graph nodes: ',len(graph.nodes()))
     # features = feature_reader(args.features_path)
@@ -21,6 +21,7 @@ def main():
     print(features.shape, target.shape)
     Scores = []
     for i in range(args.num_trial):
+        graph, features, target = dataset_reader(args)
         clustering_machine = ClusteringMachine(args, graph, features, target)
         clustering_machine.decompose()
         gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
