@@ -3,6 +3,7 @@ from parser import parameter_parser
 from clustering import ClusteringMachine
 from clustergcn import ClusterGCNTrainer
 from utils import tab_printer, dataset_reader
+import numpy as np
 # graph_reader, feature_reader, target_reader
 
 def main():
@@ -20,9 +21,15 @@ def main():
     print(features.shape, target.shape)
     clustering_machine = ClusteringMachine(args, graph, features, target)
     clustering_machine.decompose()
-    gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
-    gcn_trainer.train()
-    gcn_trainer.test()
+    Scores = []
+    for i in range(3):
+        gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
+        gcn_trainer.train()
+        score = gcn_trainer.test()
+        Scores.append(score)
+        print("\nF-1 score: {:.4f}".format(score))
+
+    print("\n\n Mean F-1 score: {:.4f}".format(np.mean(Scores)))
 
 if __name__ == "__main__":
     main()

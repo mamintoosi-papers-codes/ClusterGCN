@@ -108,4 +108,5 @@ class ClusterGCNTrainer(object):
         self.targets = np.concatenate(self.targets)
         self.predictions = np.concatenate(self.predictions).argmax(1)
         score = f1_score(self.targets, self.predictions, average="micro")
-        print("\nF-1 score: {:.4f}".format(score))
+        return score
+        # print("\nF-1 score: {:.4f}".format(score))

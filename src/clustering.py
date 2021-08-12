@@ -73,17 +73,20 @@ class ClusteringMachine(object):
         """
         model = DANMF()
         model.fit(self.graph)
-        # نرم دوی هر سطر ماتریس برابر یک می شود
-        P = normalize(model._P, axis=1)
-        near_clusters = []
-        for i in range(P.shape[0]):
-            row = P[i]
-            max_in_row = np.max(row)
-            near_clusters.append(np.where(row>max_in_row/4)[0].tolist())
 
-        # (st, parts) = metis.part_graph(self.graph, self.args.cluster_number)
         values = model.get_memberships().values()
         values_list = list(values)
+
+        if self.args.clustering_overlap == False:
+            near_clusters = values
+        else:
+            # نرم دوی هر سطر ماتریس برابر یک می شود
+            P = normalize(model._P, axis=1)
+            near_clusters = []
+            for i in range(P.shape[0]):
+                row = P[i]
+                max_in_row = np.max(row)
+                near_clusters.append(np.where(row > (max_in_row*self.args.membership_closeness))[0].tolist())
 
         self.clusters = list(set(values_list))
         self.cluster_membership = {node: membership for node, membership in enumerate(near_clusters)}
@@ -126,10 +129,12 @@ class ClusteringMachine(object):
         print('Num Clusters:', len(self.clusters))
         for cluster in self.clusters:
             # M.Amintoosi
-            if self.args.clustering_method == "danmf":
+            # subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
+            if self.args.clustering_overlap == True:
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
             else:
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if self.cluster_membership[node] == cluster])
+            print(len(subgraph.nodes()))
             self.sg_nodes[cluster] = [node for node in sorted(subgraph.nodes())]
             mapper = {node: i for i, node in enumerate(sorted(self.sg_nodes[cluster]))}
             self.sg_edges[cluster] = [[mapper[edge[0]], mapper[edge[1]]] for edge in subgraph.edges()] +  [[mapper[edge[1]], mapper[edge[0]]] for edge in subgraph.edges()]

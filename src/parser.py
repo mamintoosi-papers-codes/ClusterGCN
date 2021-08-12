@@ -7,25 +7,20 @@ def parameter_parser():
     """
     parser = argparse.ArgumentParser(description = "Run .")
 
-    parser.add_argument("--dataset_name",
+    parser.add_argument("--dataset-name",
                         type = str,
                         default = "default",
 	                help = "Dataset name (Cora, ...)")
 
-    parser.add_argument("--edge-path",
-                        nargs = "?",
-                        default = "./input/edges.csv",
-	                help = "Edge list csv.")
+    parser.add_argument("--clustering-overlap",
+                        type = bool,
+                        default = False,
+	                help = "Cluster overlapping")
 
-    parser.add_argument("--features-path",
-                        nargs = "?",
-                        default = "./input/features.csv",
-	                help = "Features json.")
-
-    parser.add_argument("--target-path",
-                        nargs = "?",
-                        default = "./input/target.csv",
-	                help = "Target classes csv.")
+    parser.add_argument("--membership-closeness",
+                        type = float,
+                        default = 0.1,
+	                help = "Percentage of other nodes' memberships relative to the membership of the closest node. Default is 0.5.")
 
     parser.add_argument("--clustering-method",
                         nargs = "?",

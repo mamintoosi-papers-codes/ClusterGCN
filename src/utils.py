@@ -65,15 +65,20 @@ def dataset_reader(args):
     # if dataset_name=='PPI':        
     #     dataset = PPI(root=path)
     if dataset_name=='default':
-        graph = graph_reader(args.edge_path)
-        features = feature_reader(args.features_path)
-        target = target_reader(args.target_path)
+        graph = graph_reader("./input/edges.csv")
+        features = feature_reader("./input/features.csv")
+        target = target_reader("./input/target.csv")
 
-    elif dataset_name=='PubMed':        
-        dataset = Planetoid(root='../tmp/PubMed', name='PubMed', split='full')
+    elif dataset_name in ['PubMed', 'Cora', 'CiteSeer']:
+        if dataset_name == 'PubMed':
+            dataset = Planetoid(root='../tmp/PubMed', name='PubMed', split='full')
+        elif dataset_name == 'Cora':
+            dataset = Planetoid(root='../tmp/Cora', name='Cora')
+        elif dataset_name == 'CiteSeer':
+            dataset = Planetoid(root='../tmp/CiteSeer', name='CiteSeer', split='full')
         data = dataset[0]
-        graph = to_networkx(data)
-        node_labels = data.y[list(graph.nodes)].numpy()
+        graph = to_networkx(data, to_undirected=True)
+        # node_labels = data.y[list(graph.nodes)].numpy()
         # len(graph.nodes()), len(graph.edges())
         features = data.x.numpy()
         target = data.y.numpy()[..., np.newaxis]
