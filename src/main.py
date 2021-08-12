@@ -18,7 +18,7 @@ def main():
     # # print('Number of graph nodes: ',len(graph.nodes()))
     # features = feature_reader(args.features_path)
     # target = target_reader(args.target_path)
-    print(features.shape, target.shape)
+    # print(features.shape, target.shape)
     Scores = []
     for i in range(args.num_trial):
         graph, features, target = dataset_reader(args)
