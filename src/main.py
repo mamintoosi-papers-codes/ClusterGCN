@@ -15,6 +15,7 @@ def main():
     print('Number of graph nodes: ',len(graph.nodes()))
     features = feature_reader(args.features_path)
     target = target_reader(args.target_path)
+    print(features.shape, target.shape)
     clustering_machine = ClusteringMachine(args, graph, features, target)
     clustering_machine.decompose()
     gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
