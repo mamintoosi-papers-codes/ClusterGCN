@@ -78,7 +78,7 @@ class ClusterGCNTrainer(object):
         """
         Training a model.
         """
-        print("Training started.\n")
+        print("\nTraining started.")
         epochs = trange(self.args.epochs, desc = "Train Loss")
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         self.model.train()

@@ -22,12 +22,12 @@ def main():
     clustering_machine = ClusteringMachine(args, graph, features, target)
     clustering_machine.decompose()
     Scores = []
-    for i in range(3):
+    for i in range(args.num_trial):
         gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
         gcn_trainer.train()
         score = gcn_trainer.test()
         Scores.append(score)
-        print("\nF-1 score: {:.4f}".format(score))
+        print("F-1 score: {:.4f}".format(score))
 
     print("\n\n Mean F-1 score: {:.4f}".format(np.mean(Scores)))
 
