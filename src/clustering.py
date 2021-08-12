@@ -88,6 +88,7 @@ class ClusteringMachine(object):
                 max_in_row = np.max(row)
                 near_clusters.append(np.where(row > (max_in_row*self.args.membership_closeness))[0].tolist())
 
+        print("\n",near_clusters)
         self.clusters = list(set(values_list))
         self.cluster_membership = {node: membership for node, membership in enumerate(near_clusters)}
 
@@ -126,11 +127,12 @@ class ClusteringMachine(object):
         self.sg_test_nodes = {}
         self.sg_features = {}
         self.sg_targets = {}
-        print('Num Clusters:', len(self.clusters))
+        print('\nNum Clusters:', len(self.clusters))
         ClusterNodes = []
         for cluster in self.clusters:
             # M.Amintoosi
             # subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
+            
             if self.args.clustering_overlap == True:
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
             else:
@@ -144,7 +146,7 @@ class ClusteringMachine(object):
             self.sg_train_nodes[cluster] = sorted(self.sg_train_nodes[cluster])
             self.sg_features[cluster] = self.features[self.sg_nodes[cluster],:]
             self.sg_targets[cluster] = self.target[self.sg_nodes[cluster],:]
-        print("Number of clusters' nodes:", np.sum(ClusterNodes))
+        print("\nNumber of clusters' nodes:", np.sum(ClusterNodes))
     def transfer_edges_and_nodes(self):
         """
         Transfering the data to PyTorch format.
