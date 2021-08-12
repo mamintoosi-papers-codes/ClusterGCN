@@ -30,7 +30,7 @@ def main():
         Scores.append(score)
         print("\nF-1 score: {:.4f}".format(score))
 
-    print("\n\n Mean F-1 score: {:.4f}".format(np.mean(Scores)))
+    print("\n\n Mean F-1 score: {:.2f}".format(np.mean(Scores)))
 
 if __name__ == "__main__":
     main()
