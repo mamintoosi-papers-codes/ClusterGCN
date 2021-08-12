@@ -2,7 +2,8 @@ import torch
 from parser import parameter_parser
 from clustering import ClusteringMachine
 from clustergcn import ClusterGCNTrainer
-from utils import tab_printer, graph_reader, feature_reader, target_reader
+from utils import tab_printer, dataset_reader
+# graph_reader, feature_reader, target_reader
 
 def main():
     """
@@ -11,10 +12,11 @@ def main():
     args = parameter_parser()
     torch.manual_seed(args.seed)
     tab_printer(args)
-    graph = graph_reader(args.edge_path)
-    print('Number of graph nodes: ',len(graph.nodes()))
-    features = feature_reader(args.features_path)
-    target = target_reader(args.target_path)
+    graph, features, target = dataset_reader(args)
+    # graph = graph_reader(args.edge_path)
+    # # print('Number of graph nodes: ',len(graph.nodes()))
+    # features = feature_reader(args.features_path)
+    # target = target_reader(args.target_path)
     print(features.shape, target.shape)
     clustering_machine = ClusteringMachine(args, graph, features, target)
     clustering_machine.decompose()

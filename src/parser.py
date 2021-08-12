@@ -7,6 +7,11 @@ def parameter_parser():
     """
     parser = argparse.ArgumentParser(description = "Run .")
 
+    parser.add_argument("--dataset_name",
+                        type = str,
+                        default = "default",
+	                help = "Dataset name (Cora, ...)")
+
     parser.add_argument("--edge-path",
                         nargs = "?",
                         default = "./input/edges.csv",

@@ -4,6 +4,9 @@ import pandas as pd
 import networkx as nx
 from texttable import Texttable
 from scipy.sparse import coo_matrix
+from torch_geometric.datasets import PPI
+from torch_geometric.datasets import Planetoid
+from torch_geometric.utils.convert import to_networkx
 
 def tab_printer(args):
     """
@@ -39,6 +42,8 @@ def feature_reader(path):
     feature_count = max(feature_index)+1
     features = coo_matrix((feature_values, (node_index, feature_index)), shape=(node_count, feature_count)).toarray()
     return features
+    # Number of graph nodes:  19717
+    # (19717, 500) (19717, 1)
 
 def target_reader(path):
     """
@@ -48,3 +53,29 @@ def target_reader(path):
     """
     target = np.array(pd.read_csv(path)["target"]).reshape(-1,1)
     return target
+
+def dataset_reader(args):
+    """
+    Reading the dataset
+    :param dataset_name: Name of the dataset.
+    :param path: Path to the target.
+    :return target: Target vector.
+    """
+    dataset_name = args.dataset_name
+    # if dataset_name=='PPI':        
+    #     dataset = PPI(root=path)
+    if dataset_name=='default':
+        graph = graph_reader(args.edge_path)
+        features = feature_reader(args.features_path)
+        target = target_reader(args.target_path)
+
+    elif dataset_name=='PubMed':        
+        dataset = Planetoid(root='../tmp/PubMed', name='PubMed', split='full')
+        data = dataset[0]
+        graph = to_networkx(data)
+        node_labels = data.y[list(graph.nodes)].numpy()
+        # len(graph.nodes()), len(graph.edges())
+        features = data.x.numpy()
+        target = data.y.numpy()[..., np.newaxis]
+
+    return graph, features, target
