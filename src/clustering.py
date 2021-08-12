@@ -8,6 +8,7 @@ from sklearn.preprocessing import normalize
 # from cdlib import algorithms, viz
 # با کتابخانه بالا در کولب مشکل دارم!
 from karateclub.community_detection.overlapping import DANMF
+from karateclub import SymmNMF #NNSED #EgoNetSplitter
 
 class ClusteringMachine(object):
     """
@@ -51,6 +52,7 @@ class ClusteringMachine(object):
             self.graph_clustering()
         self.general_data_partitioning()
         self.transfer_edges_and_nodes()
+        # print((self.cluster_membership))
 
     def random_clustering(self):
         """
@@ -71,7 +73,10 @@ class ClusteringMachine(object):
         """
         Clustering the graph with DANMF. For details see:
         """
-        model = DANMF()
+        # model = DANMF(pre_iterations = 500, iterations = 200)
+        # model = EgoNetSplitter(1.0) # ماتریس احتمال بر نمی‌گرداند
+        # model = NNSED() # این هم همچنین
+        model = SymmNMF() # در شبکه خطا میده!
         model.fit(self.graph)
 
         values = model.get_memberships().values()
@@ -81,17 +86,21 @@ class ClusteringMachine(object):
             near_clusters = values
         else:
             # نرم دوی هر سطر ماتریس برابر یک می شود
-            P = normalize(model._P, axis=1)
+            # DANMF ->P, SymmNMF->W
+            P = normalize(model._W, axis=1)
             near_clusters = []
             for i in range(P.shape[0]):
                 row = P[i]
                 max_in_row = np.max(row)
-                near_clusters.append(np.where(row > (max_in_row*self.args.membership_closeness))[0].tolist())
+                npw = np.where(row >= (max_in_row*self.args.membership_closeness))
+                tmp = npw[0].tolist()
+                # print(type(row), row, "max in row", max_in_row, 'npw', npw, 'tmp', tmp)
+                near_clusters.append(tmp)
 
-        print("\n",near_clusters)
+        # print("\n near_clusters", type(near_clusters), near_clusters)
         self.clusters = list(set(values_list))
         self.cluster_membership = {node: membership for node, membership in enumerate(near_clusters)}
-
+        
     def graph_clustering(self):
         """
         Clustering the graph with other graph clustering algorithms
