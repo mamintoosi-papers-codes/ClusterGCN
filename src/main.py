@@ -19,10 +19,10 @@ def main():
     # features = feature_reader(args.features_path)
     # target = target_reader(args.target_path)
     print(features.shape, target.shape)
-    clustering_machine = ClusteringMachine(args, graph, features, target)
-    clustering_machine.decompose()
     Scores = []
     for i in range(args.num_trial):
+        clustering_machine = ClusteringMachine(args, graph, features, target)
+        clustering_machine.decompose()
         gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
         gcn_trainer.train()
         score = gcn_trainer.test()
