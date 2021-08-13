@@ -51,15 +51,18 @@ class ClusteringMachine(object):
             print("\ngraph clustering started.\n")
             self.graph_clustering()
         
-        # print('clusters, len',self.clusters, len(self.clusters))
-        # self.cluster_lens = np.zeros(len(self.clusters))
-        # for i in range(len(self.cluster_membership)):
-        #     for j in self.cluster_membership[i]:
-        #         self.cluster_lens[j] +=1 
+        print('clusters, len',self.clusters, len(self.clusters))
+        self.cluster_lens = np.zeros(len(self.clusters))
+        for i in range(len(self.cluster_membership)):
+            if isinstance(self.cluster_membership[i], int):
+                self.cluster_lens[self.cluster_membership[i]] += 1
+            else:
+                for j in self.cluster_membership[i]:
+                    self.cluster_lens[j] +=1 
 
-        # print(self.cluster_lens)        
-        # print('Clusters info: Min, Max element numbers:',\
-        #  np.min(self.cluster_lens), np.max(self.cluster_lens))
+        print(self.cluster_lens)        
+        print('Clusters info: Min, Max, Sum element numbers:',\
+         np.min(self.cluster_lens), np.max(self.cluster_lens), np.sum(self.cluster_lens))
 
         self.general_data_partitioning()
         self.transfer_edges_and_nodes()
@@ -84,23 +87,24 @@ class ClusteringMachine(object):
         """
         Clustering the graph with DANMF. For details see:
         """
-        # model = DANMF(pre_iterations = 500, iterations = 200)
+        model = DANMF(pre_iterations = 500, iterations = 200)
         # model = EgoNetSplitter(1.0) # ماتریس احتمال بر نمی‌گرداند
         # model = NNSED() # این هم همچنین
-        model = SymmNMF() # در شبکه خطا میده!
+        # model = SymmNMF() # در شبکه خطا میده!
         model.fit(self.graph)
 
         values = model.get_memberships().values()
         # print('values', values)
         values_list = list(values)
-        print('values_list==11', 11 in values_list)
+        # print('values_list==11', 11 in values_list)
 
         if self.args.clustering_overlap == False:
             near_clusters = values
         else:
             # نرم دوی هر سطر ماتریس برابر یک می شود
             # DANMF ->P, SymmNMF->W
-            P = normalize(model._W, axis=1)
+            # P = normalize(model._W, axis=1)
+            P = normalize(model._P, axis=1)
             print('P.shape', P.shape)
             near_clusters = []
             for i in range(P.shape[0]):
@@ -115,7 +119,7 @@ class ClusteringMachine(object):
 
         # باید خوشه‌هایی که نیستند حذف شده و سایر اندیس ها اصلاح شوند
 
-        print("\n near_clusters", type(near_clusters), near_clusters)
+        # print("\n near_clusters", type(near_clusters), near_clusters)
         self.clusters = list(set(values_list)) # وقتی یک خوشه خالی باشه گیر داره
         # مشکل باید از جای دیگری باشه. شماره ۱۱ در لیست اصلی نیست اما در دومی هست در کورا
         # self.clusters = list(np.arange(0,np.max(values_list)+1))
@@ -166,6 +170,7 @@ class ClusteringMachine(object):
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
             else:
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if self.cluster_membership[node] == cluster])
+            # print('len subgraph', len(subgraph.nodes()))
             ClusterNodes.append(len(subgraph.nodes()))
             self.sg_nodes[cluster] = [node for node in sorted(subgraph.nodes())]
             mapper = {node: i for i, node in enumerate(sorted(self.sg_nodes[cluster]))}
@@ -175,7 +180,7 @@ class ClusteringMachine(object):
             self.sg_train_nodes[cluster] = sorted(self.sg_train_nodes[cluster])
             self.sg_features[cluster] = self.features[self.sg_nodes[cluster],:]
             self.sg_targets[cluster] = self.target[self.sg_nodes[cluster],:]
-        print("\nNumber of clusters' nodes:", np.sum(ClusterNodes))
+        # print("\nNumber of clusters' nodes:", np.sum(ClusterNodes))
     def transfer_edges_and_nodes(self):
         """
         Transfering the data to PyTorch format.
