@@ -96,6 +96,7 @@ class ClusteringMachine(object):
         values = model.get_memberships().values()
         # print('values', values)
         values_list = list(values)
+        print('values_list==11', 11 in values_list)
 
         if self.args.clustering_overlap == False:
             near_clusters = values

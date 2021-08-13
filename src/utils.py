@@ -6,6 +6,7 @@ from texttable import Texttable
 from scipy.sparse import coo_matrix
 from torch_geometric.datasets import PPI
 from torch_geometric.datasets import Planetoid
+from torch_geometric.datasets import WikiCS
 from torch_geometric.utils.convert import to_networkx
 
 def tab_printer(args):
@@ -69,13 +70,15 @@ def dataset_reader(args):
         features = feature_reader("./input/features.csv")
         target = target_reader("./input/target.csv")
 
-    elif dataset_name in ['PubMed', 'Cora', 'CiteSeer']:
+    elif dataset_name in ['PubMed', 'Cora', 'CiteSeer','WikiCS']:
         if dataset_name == 'PubMed':
             dataset = Planetoid(root=args.ds_root+'/PubMed', name='PubMed', split='full')
         elif dataset_name == 'Cora':
             dataset = Planetoid(root=args.ds_root+'/Cora', name='Cora', split='full')
         elif dataset_name == 'CiteSeer':
             dataset = Planetoid(root=args.ds_root+'/CiteSeer', name='CiteSeer', split='full')
+        elif dataset_name == 'WikiCS':
+            dataset = WikiCS(root=args.ds_root+'/WikiCS')
         data = dataset[0]
         graph = to_networkx(data, to_undirected=True)
         # node_labels = data.y[list(graph.nodes)].numpy()
