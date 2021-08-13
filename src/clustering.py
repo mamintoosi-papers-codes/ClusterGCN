@@ -50,22 +50,19 @@ class ClusteringMachine(object):
         elif self.args.clustering_method == "graph":
             print("\ngraph clustering started.\n")
             self.graph_clustering()
+        
+        # print('clusters, len',self.clusters, len(self.clusters))
+        # self.cluster_lens = np.zeros(len(self.clusters))
+        # for i in range(len(self.cluster_membership)):
+        #     for j in self.cluster_membership[i]:
+        #         self.cluster_lens[j] +=1 
+
+        # print(self.cluster_lens)        
+        # print('Clusters info: Min, Max element numbers:',\
+        #  np.min(self.cluster_lens), np.max(self.cluster_lens))
+
         self.general_data_partitioning()
         self.transfer_edges_and_nodes()
-        # print((self.cluster_membership))
-        # cluster_lens = np.zeros(len(self.clusters))
-        # for i in range(len(self.clusters)):
-        #     cluster_lens[self.clusters[i]] += 1
-        # print('Clusters info: Min, Max element numbers:', np.min(cluster_lens), np.max(cluster_lens))
-        print('clusters, len',self.clusters, len(self.clusters))
-        self.cluster_lens = np.zeros(len(self.clusters))
-        for i in range(len(self.cluster_membership)):
-            for j in self.cluster_membership[i]:
-                self.cluster_lens[j] +=1 
-
-        print(self.cluster_lens)        
-        print('Clusters info: Min, Max element numbers:',\
-         np.min(self.cluster_lens), np.max(self.cluster_lens))
 
 
     def random_clustering(self):
@@ -111,13 +108,17 @@ class ClusteringMachine(object):
                 max_in_row = np.max(row)
                 npw = np.where(row >= (max_in_row*self.args.membership_closeness))
                 tmp = npw[0].tolist()
+                # نگهداری فقط خوشه‌هایی که در لیست اولیه بوده اند
+                cluster_indices = [x for x in tmp if x in values_list]
                 # print(type(row), row, "max in row", max_in_row, 'npw', npw, 'tmp', tmp)
-                near_clusters.append(tmp)
+                near_clusters.append(cluster_indices)
 
-        # print("\n near_clusters", type(near_clusters), near_clusters)
-        # self.clusters = list(set(values_list)) # وقتی یک خوشه خالی باشه گیر داره
-        # مشکل باید از جای دیگری باشه. شماره ۱۱ خالی نبود ولی غیب بود
-        self.clusters = list(np.arange(0,np.max(values_list)+1))
+        # باید خوشه‌هایی که نیستند حذف شده و سایر اندیس ها اصلاح شوند
+
+        print("\n near_clusters", type(near_clusters), near_clusters)
+        self.clusters = list(set(values_list)) # وقتی یک خوشه خالی باشه گیر داره
+        # مشکل باید از جای دیگری باشه. شماره ۱۱ در لیست اصلی نیست اما در دومی هست در کورا
+        # self.clusters = list(np.arange(0,np.max(values_list)+1))
         self.cluster_membership = {node: membership for node, membership in enumerate(near_clusters)}
         
     def graph_clustering(self):
