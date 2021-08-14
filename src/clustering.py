@@ -51,18 +51,18 @@ class ClusteringMachine(object):
             print("\ngraph clustering started.\n")
             self.graph_clustering()
         
-        print('clusters, len',self.clusters, len(self.clusters))
-        self.cluster_lens = np.zeros(len(self.clusters))
-        for i in range(len(self.cluster_membership)):
-            if isinstance(self.cluster_membership[i], int):
-                self.cluster_lens[self.cluster_membership[i]] += 1
-            else:
-                for j in self.cluster_membership[i]:
-                    self.cluster_lens[j] +=1 
+        # print('clusters, len',self.clusters, len(self.clusters))
+        # self.cluster_lens = np.zeros(len(self.clusters))
+        # for i in range(len(self.cluster_membership)):
+        #     if isinstance(self.cluster_membership[i], int):
+        #         self.cluster_lens[self.cluster_membership[i]] += 1
+        #     else:
+        #         for j in self.cluster_membership[i]:
+        #             self.cluster_lens[j] +=1 
 
-        print(self.cluster_lens)        
-        print('Clusters info: Min, Max, Sum element numbers:',\
-         np.min(self.cluster_lens), np.max(self.cluster_lens), np.sum(self.cluster_lens))
+        # print(self.cluster_lens)        
+        # print('Clusters info: Min, Max, Sum element numbers:',\
+        #  np.min(self.cluster_lens), np.max(self.cluster_lens), np.sum(self.cluster_lens))
 
         self.general_data_partitioning()
         self.transfer_edges_and_nodes()
@@ -110,10 +110,17 @@ class ClusteringMachine(object):
             for i in range(P.shape[0]):
                 row = P[i]
                 max_in_row = np.max(row)
+                
                 npw = np.where(row >= (max_in_row*self.args.membership_closeness))
                 tmp = npw[0].tolist()
+                # برای تعداد زیادی از سطرها همه مقادیر صفر است.
+                if max_in_row == 0:
+                    cluster_indices = [tmp[0]]    
+                    # print('max =0:', cluster_indices)
+                else:
                 # نگهداری فقط خوشه‌هایی که در لیست اولیه بوده اند
-                cluster_indices = [x for x in tmp if x in values_list]
+                    cluster_indices = [x for x in tmp if x in values_list]
+                    # print('max !=0:', cluster_indices)
                 # print(type(row), row, "max in row", max_in_row, 'npw', npw, 'tmp', tmp)
                 near_clusters.append(cluster_indices)
 
@@ -161,7 +168,7 @@ class ClusteringMachine(object):
         self.sg_features = {}
         self.sg_targets = {}
         print('\nNum Clusters:', len(self.clusters))
-        ClusterNodes = []
+        self.ClusterNodes = []
         for cluster in self.clusters:
             # M.Amintoosi
             # subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if cluster in self.cluster_membership[node]])
@@ -171,7 +178,7 @@ class ClusteringMachine(object):
             else:
                 subgraph = self.graph.subgraph([node for node in sorted(self.graph.nodes()) if self.cluster_membership[node] == cluster])
             # print('len subgraph', len(subgraph.nodes()))
-            ClusterNodes.append(len(subgraph.nodes()))
+            self.ClusterNodes.append(len(subgraph.nodes()))
             self.sg_nodes[cluster] = [node for node in sorted(subgraph.nodes())]
             mapper = {node: i for i, node in enumerate(sorted(self.sg_nodes[cluster]))}
             self.sg_edges[cluster] = [[mapper[edge[0]], mapper[edge[1]]] for edge in subgraph.edges()] +  [[mapper[edge[1]], mapper[edge[0]]] for edge in subgraph.edges()]
@@ -180,7 +187,7 @@ class ClusteringMachine(object):
             self.sg_train_nodes[cluster] = sorted(self.sg_train_nodes[cluster])
             self.sg_features[cluster] = self.features[self.sg_nodes[cluster],:]
             self.sg_targets[cluster] = self.target[self.sg_nodes[cluster],:]
-        # print("\nNumber of clusters' nodes:", np.sum(ClusterNodes))
+        print("\nNumber of clusters' nodes:", np.sum(self.ClusterNodes))
     def transfer_edges_and_nodes(self):
         """
         Transfering the data to PyTorch format.
