@@ -28,7 +28,6 @@ import time
     # """
     # Parsing command line parameters, reading data, graph decomposition, fitting a ClusterGCN and scoring the model.
     # """
-start = time.time()    
 args = parameter_parser()
 torch.manual_seed(args.seed)
 # tab_printer(args)
@@ -39,19 +38,20 @@ torch.manual_seed(args.seed)
 # target = target_reader(args.target_path)
 # print(features.shape, target.shape)
 Scores = []
-for i in range(args.num_trial):
-    graph, features, target = dataset_reader(args)
-    print(features.shape, target.shape)
-    clustering_machine = ClusteringMachine(args, graph, features, target)
-    clustering_machine.decompose()
-    gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
-    gcn_trainer.train()
-    score = gcn_trainer.test()
-    Scores.append(score)
-    print("\nF-1 score: {:.2f}".format(score))
+# for i in range(args.num_trial):
+graph, features, target = dataset_reader(args)
+print(features.shape, target.shape)
+start = time.time()    
+clustering_machine = ClusteringMachine(args, graph, features, target)
+clustering_machine.decompose()
+gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
+gcn_trainer.train()
+score = gcn_trainer.test()
+Scores.append(score)
+print("\nF-1 score: {:.2f}".format(score))
 
-if args.num_trial>1:
-    print("\n\n Mean F-1 score: {:.2f}".format(np.mean(Scores)))
+# if args.num_trial>1:
+#     print("\n\n Mean F-1 score: {:.2f}".format(np.mean(Scores)))
 
 end = time.time()
 run_time = end - start
