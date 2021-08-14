@@ -87,7 +87,9 @@ class ClusteringMachine(object):
         """
         Clustering the graph with DANMF. For details see:
         """
-        model = DANMF(pre_iterations = 500, iterations = 200)
+        num_labels = {'CiteSeer':6, 'Cora':7, 'PubMed':3, 'WikiCS':10}
+
+        model = DANMF(layers=[32,2*num_labels[self.args.dataset_name]], pre_iterations = 500, iterations = 200)
         # model = EgoNetSplitter(1.0) # ماتریس احتمال بر نمی‌گرداند
         # model = NNSED() # این هم همچنین
         # model = SymmNMF() # در شبکه خطا میده!
@@ -105,7 +107,7 @@ class ClusteringMachine(object):
             # DANMF ->P, SymmNMF->W
             # P = normalize(model._W, axis=1)
             P = normalize(model._P, axis=1)
-            print('P.shape', P.shape)
+            # print('P.shape', P.shape)
             near_clusters = []
             for i in range(P.shape[0]):
                 row = P[i]
@@ -167,7 +169,7 @@ class ClusteringMachine(object):
         self.sg_test_nodes = {}
         self.sg_features = {}
         self.sg_targets = {}
-        print('\nNum Clusters:', len(self.clusters))
+        # print('\nNum Clusters:', len(self.clusters))
         self.ClusterNodes = []
         for cluster in self.clusters:
             # M.Amintoosi
@@ -187,7 +189,7 @@ class ClusteringMachine(object):
             self.sg_train_nodes[cluster] = sorted(self.sg_train_nodes[cluster])
             self.sg_features[cluster] = self.features[self.sg_nodes[cluster],:]
             self.sg_targets[cluster] = self.target[self.sg_nodes[cluster],:]
-        print("\nNumber of clusters' nodes:", np.sum(self.ClusterNodes))
+        # print("\nNumber of clusters' nodes:", np.sum(self.ClusterNodes))
     def transfer_edges_and_nodes(self):
         """
         Transfering the data to PyTorch format.

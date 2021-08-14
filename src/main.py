@@ -40,7 +40,7 @@ torch.manual_seed(args.seed)
 Scores = []
 # for i in range(args.num_trial):
 graph, features, target = dataset_reader(args)
-print(features.shape, target.shape)
+# print(features.shape, target.shape)
 start = time.time()    
 clustering_machine = ClusteringMachine(args, graph, features, target)
 clustering_machine.decompose()
@@ -48,7 +48,7 @@ gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
 gcn_trainer.train()
 score = gcn_trainer.test()
 Scores.append(score)
-print("\nF-1 score: {:.2f}".format(score))
+# print("\nF-1 score: {:.2f}".format(score))
 
 # if args.num_trial>1:
 #     print("\n\n Mean F-1 score: {:.2f}".format(np.mean(Scores)))
