@@ -41,9 +41,9 @@ Scores = []
 # for i in range(args.num_trial):
 graph, features, target = dataset_reader(args)
 # print(features.shape, target.shape)
-start = time.time()    
 clustering_machine = ClusteringMachine(args, graph, features, target)
 clustering_machine.decompose()
+start = time.time()    
 gcn_trainer = ClusterGCNTrainer(args, clustering_machine)
 gcn_trainer.train()
 score = gcn_trainer.test()

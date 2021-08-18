@@ -59,8 +59,8 @@ def parameter_parser():
 
     parser.add_argument("--test-ratio",
                         type = float,
-                        default = 0.3,
-	                help = "Test data ratio. Default is 0.3.")
+                        default = 0.1,
+	                help = "Test data ratio. Default is 0.1.")
 
     parser.add_argument("--cluster-number",
                         type = int,
