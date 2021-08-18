@@ -66,7 +66,7 @@ run_time = end - start
 #     }, index=[0])
     #  'All Clusters Nodes': np.sum(clustering_machine.ClusterNodes),
 ds_report = [args.membership_closeness, args.dataset_name, score, \
-    np.sum(clustering_machine.ClusterNodes)/len(graph.nodes())-1,\
+    np.sum(clustering_machine.ClusterNodes)/len(graph.nodes()),\
         run_time ]
 
 # sns.lineplot(x="k", y="apk",
